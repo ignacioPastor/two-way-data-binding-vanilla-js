@@ -1,7 +1,13 @@
 
 const ATT_TWB = 'data-tw-bind';
 const isTextInput = element => element?.type === 'text' || element?.type === 'textarea';
-const getTwElements = () => document.querySelectorAll(`[${ATT_TWB}]`);
+const getTwElements = nameProp => {
+  const elements = document.querySelectorAll(`[${ATT_TWB}]`);
+  if (nameProp) {
+    return Array.from(elements).filter(el => el.getAttribute(ATT_TWB) === nameProp);
+  }
+  return elements;
+}
 
 class PropTwBind {
   constructor(nameProp) {
@@ -16,13 +22,11 @@ class PropTwBind {
   set value(newValue) {
     this._value = newValue;
 
-    getTwElements().forEach(element => {
-      if (element.getAttribute(ATT_TWB) === this._nameProp) {
-        if (isTextInput(element)) {
-          element.value = this.value;
-        } else if (!element.type) {
-          element.innerHTML = this.value;
-        }
+    getTwElements(this._nameProp).forEach(element => {
+      if (isTextInput(element)) {
+        element.value = this.value;
+      } else if (!element.type) {
+        element.innerHTML = this.value;
       }
     });
   }
